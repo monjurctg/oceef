@@ -28,11 +28,25 @@ jobs:
         php artisan route:cache
         php artisan view:cache
 
-    - name: Upload to cPanel via FTP
-      uses: SamKirkland/FTP-Deploy-Action@main
-      with:
-        server: ${{ secrets.CPANEL_HOST }}
-        username: ${{ secrets.CPANEL_USERNAME }}
-        password: ${{ secrets.CPANEL_PASSWORD }}
-        protocol: "ftps"
-        server-dir: ${{ secrets.CPANEL_DEPLOY_PATH }}
+    - name: Upload to cPanel via FTPS (lftp)
+      env:
+        CP_HOST: ${{ secrets.CPANEL_HOST }}
+        CP_USER: ${{ secrets.CPANEL_USERNAME }}
+        CP_PASS: ${{ secrets.CPANEL_PASSWORD }}
+        CP_PATH: ${{ secrets.CPANEL_DEPLOY_PATH }}
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y lftp
+        # Use lftp to mirror local repo to remote path via FTPS.
+        # Exclude common large/unnecessary dirs; adjust excludes as needed.
+        lftp -c "\
+          set ftp:ssl-force true; \
+          set ftp:ssl-protect-data true; \
+          set ssl:verify-certificate false; \
+          open -u \"$CP_USER\",\"$CP_PASS\" ftps://$CP_HOST; \
+          mirror -R --delete --verbose --parallel=4 \
+            --exclude-glob .git* \
+            --exclude node_modules \
+            --exclude .github \
+            ./ \"$CP_PATH\" \
+        "
