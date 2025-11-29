@@ -12,6 +12,25 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Detect committed credentials (fail if found)
+      run: |
+        echo "Scanning repository for plaintext credentials..."
+        # Look for explicit CPANEL_* variables or URL-style credentials (user:pass@host).
+        # Adjust patterns if you used a custom format.
+        FOUND=$(git grep -nE --no-color 'CPANEL_USERNAME|CPANEL_PASSWORD|CPANEL_PASS|cpanel_username|cpanel_password' || true)
+        CRED_URLS=$(git grep -nE --no-color '://[^@[:space:]]+@' || true)
+        if [ -n "$FOUND" ] || [ -n "$CRED_URLS" ]; then
+          echo "Potential plaintext credentials found in repository:"
+          [ -n "$FOUND" ] && echo "$FOUND"
+          [ -n "$CRED_URLS" ] && echo "$CRED_URLS"
+          echo ""
+          echo "ACTION REQUIRED: Remove these credentials from the repository, add them to"
+          echo "Repository Settings → Secrets (CPANEL_HOST, CPANEL_USERNAME, CPANEL_PASSWORD),"
+          echo "and rotate the compromised credentials in cPanel immediately."
+          exit 1
+        fi
+        echo "No obvious plaintext credentials detected."
+
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
