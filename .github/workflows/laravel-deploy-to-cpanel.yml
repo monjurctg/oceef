@@ -22,8 +22,17 @@ jobs:
 
     - name: Build Laravel app
       run: |
-        cp .env.example .env
-        php artisan key:generate
+        # Only create .env if it does not already exist.
+        if [ ! -f .env ]; then
+          cp .env.example .env
+          php artisan key:generate
+        else
+          # If .env exists but APP_KEY is missing or empty, generate one.
+          APP_KEY_VALUE=$(awk -F= '/^APP_KEY=/{print $2}' .env || true)
+          if [ -z "$APP_KEY_VALUE" ]; then
+            php artisan key:generate
+          fi
+        fi
         php artisan config:cache
         php artisan route:cache
         php artisan view:cache
