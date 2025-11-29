@@ -29,7 +29,7 @@ jobs:
         php artisan view:cache
 
     - name: Upload to cPanel via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4
+      uses: SamKirkland/FTP-Deploy-Action@main
       with:
         server: ${{ secrets.CPANEL_HOST }}
         username: ${{ secrets.CPANEL_USERNAME }}
