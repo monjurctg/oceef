@@ -95,3 +95,6 @@ composer.lock
 /.php_cs.cache
 /.php_cs.php
 /phpstan.neon
+
+# Prevent web-triggered deploy script from being committed
+/deploy.php
