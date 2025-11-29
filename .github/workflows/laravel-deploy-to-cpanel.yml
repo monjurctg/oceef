@@ -24,8 +24,29 @@ jobs:
       run: |
         # Only create .env if it does not already exist.
         if [ ! -f .env ]; then
-          cp .env.example .env
-          php artisan key:generate
+          if [ -f .env.example ]; then
+            cp .env.example .env
+          else
+            echo "No .env.example found — creating minimal .env"
+            # Try to get a key from artisan; fallback to PHP random bytes if artisan fails.
+            APP_KEY=$(php artisan key:generate --show 2>/dev/null || true)
+            if [ -z "$APP_KEY" ]; then
+              RAND=$(php -r "echo base64_encode(random_bytes(32));")
+              APP_KEY="base64:$RAND"
+            fi
+            cat > .env <<EOF
+APP_NAME=Laravel
+APP_ENV=production
+APP_KEY=$APP_KEY
+APP_DEBUG=false
+APP_URL=
+EOF
+          fi
+
+          # Ensure APP_KEY is present; if not, let artisan write it.
+          if ! grep -q '^APP_KEY=' .env || [ -z "$(awk -F= '/^APP_KEY=/{print $2}' .env)" ]; then
+            php artisan key:generate
+          fi
         else
           # If .env exists but APP_KEY is missing or empty, generate one.
           APP_KEY_VALUE=$(awk -F= '/^APP_KEY=/{print $2}' .env || true)
@@ -33,9 +54,47 @@ jobs:
             php artisan key:generate
           fi
         fi
+
         php artisan config:cache
         php artisan route:cache
         php artisan view:cache
+
+    # Optional: run migrations from the runner against the remote DB.
+    # This requires DB_* secrets to be set in repository Settings -> Secrets.
+    - name: Run migrations on remote DB (optional)
+      if: ${{ secrets.DB_HOST != '' }}
+      env:
+        DB_CONNECTION: ${{ secrets.DB_CONNECTION || 'mysql' }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ secrets.DB_PORT || '3306' }}
+        DB_DATABASE: ${{ secrets.DB_DATABASE }}
+        DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        APP_ENV: production
+      run: |
+        echo "Running migrations against remote DB..."
+        # Ensure vendor and artisan are present
+        if [ ! -f artisan ] || [ ! -f vendor/autoload.php ]; then
+          echo "artisan or vendor missing; aborting migrations"
+          exit 1
+        fi
+        php artisan migrate --force
+
+    # Alternative: run migrations on the server via SSH (uncomment & configure if you have SSH access)
+    # - name: Run migrations on remote server via SSH (alternative)
+    #   env:
+    #     SSH_HOST: ${{ secrets.SSH_HOST }}
+    #     SSH_USER: ${{ secrets.SSH_USER }}
+    #     SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    #   run: |
+    #     if [ -z "$SSH_HOST" ] || [ -z "$SSH_PRIVATE_KEY" ]; then
+    #       echo "SSH secrets not configured; skipping"
+    #       exit 0
+    #     fi
+    #     mkdir -p ~/.ssh
+    #     echo "$SSH_KEY" > ~/.ssh/deploy_key
+    #     chmod 600 ~/.ssh/deploy_key
+    #     ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key $SSH_USER@$SSH_HOST "cd /path/to/your/app && php artisan migrate --force"
 
     - name: Upload to cPanel via FTPS (lftp)
       env:
