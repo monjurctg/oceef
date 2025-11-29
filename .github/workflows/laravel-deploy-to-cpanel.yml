@@ -105,16 +105,20 @@ EOF
       run: |
         sudo apt-get update -y
         sudo apt-get install -y lftp
-        # Use lftp to mirror local repo to remote path via FTPS.
-        # Exclude common large/unnecessary dirs; adjust excludes as needed.
+        # Upload only newer/changed files and DO NOT delete remote files.
+        # Exclude config/runtime dirs so existing server project and data are preserved.
         lftp -c "\
           set ftp:ssl-force true; \
           set ftp:ssl-protect-data true; \
           set ssl:verify-certificate false; \
           open -u \"$CP_USER\",\"$CP_PASS\" ftps://$CP_HOST; \
-          mirror -R --delete --verbose --parallel=4 \
+          mirror -R --only-newer --verbose --parallel=4 \
             --exclude-glob .git* \
-            --exclude node_modules \
-            --exclude .github \
+            --exclude-glob .env \
+            --exclude-glob .env.* \
+            --exclude-glob node_modules \
+            --exclude-glob vendor \
+            --exclude-glob storage \
+            --exclude-glob .github \
             ./ \"$CP_PATH\" \
         "
