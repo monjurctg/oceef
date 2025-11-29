@@ -1,0 +1,36 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+
+    - name: Install dependencies
+      run: composer install --no-dev --optimize-autoloader
+
+    - name: Run migrations
+      run: php artisan migrate --force
+
+    - name: Clear caches
+      run: |
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+
+    - name: Deploy to server
+      run: |
+        # Add your deployment script here
+        # This could be rsync, scp, or any other deployment method
+        echo "Deploying to server..."

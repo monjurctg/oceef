@@ -1,0 +1,97 @@
+# Laravel-specific files and directories
+/vendor/
+/node_modules/
+/public/storage
+/storage/*.key
+.env
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+/npm-debug.log*
+/yarn-error.log*
+
+# Laravel logs
+/storage/logs/*.log
+
+# Compiled PHP files
+*.php~
+*.php#
+
+# IDE and editor files
+/.idea/
+/.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Composer
+composer.phar
+composer.lock
+
+# Artisan
+/.env.php
+/storage/meta/
+/storage/views/
+/storage/cache/
+/storage/sessions/
+/storage/framework/cache/data/
+
+# Database
+*.sqlite
+*.sqlite3
+
+# Vagrant
+/.vagrant/
+
+# PHPUnit
+/phpunit.xml
+/phpunit.xml.dist
+/coverage/
+/phpunit_report/
+/phpunit_log.txt
+
+# Miscellaneous
+/.codeintel/
+/.codekit-cache/
+/.sass-cache/
+/connect.lock
+/dump.rdb
+/env/
+/humans.txt
+/robots.txt
+/sitemap.xml
+/log/
+/logs/
+
+# Temporary files
+*.tmp
+*.temp
+~*
+
+# Uploaded files
+/public/uploads/
+/storage/app/public/uploads/
+
+# Browser sync
+/browser-sync/
+
+# Laravel Mix
+/mix-manifest.json
+
+# Package managers
+/.yarn-integrity
+/.yarn-metadata*
+/.yarn-cache/
+
+# Testing
+/.php_cs.cache
+/.php_cs.php
+/phpstan.neon
