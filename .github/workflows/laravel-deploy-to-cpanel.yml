@@ -1,13 +1,15 @@
-name: Laravel Deploy to cPanel
+name: CI / CD — Laravel to cPanel
 
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  deploy:
+  ci:
+    name: Continuous Integration
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -15,8 +17,6 @@ jobs:
     - name: Detect committed credentials (fail if found)
       run: |
         echo "Scanning repository for plaintext credentials..."
-        # Look for explicit CPANEL_* variables or URL-style credentials (user:pass@host).
-        # Adjust patterns if you used a custom format.
         FOUND=$(git grep -nE --no-color 'CPANEL_USERNAME|CPANEL_PASSWORD|CPANEL_PASS|cpanel_username|cpanel_password' || true)
         CRED_URLS=$(git grep -nE --no-color '://[^@[:space:]]+@' || true)
         if [ -n "$FOUND" ] || [ -n "$CRED_URLS" ]; then
@@ -31,12 +31,53 @@ jobs:
         fi
         echo "No obvious plaintext credentials detected."
 
+    - name: Cache Composer dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.composer/cache
+        key: composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: composer-
+
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
 
     - name: Install Composer dependencies
+      run: composer install --no-interaction --prefer-dist --no-progress
+
+    - name: Run tests (phpunit if present)
+      run: |
+        if [ -f phpunit.xml ] || [ -f phpunit.xml.dist ]; then
+          vendor/bin/phpunit --colors=never || (echo "Tests failed"; exit 1)
+        else
+          echo "No phpunit config found — skipping tests"
+        fi
+
+    - name: Basic static analysis (optional)
+      run: |
+        # try common tools if present; skip if not installed
+        if command -v vendor/bin/phpstan >/dev/null 2>&1; then
+          vendor/bin/phpstan analyse || echo "phpstan reported issues"
+        else
+          echo "phpstan not found — skipping static analysis"
+        fi
+
+  deploy:
+    name: Deploy to cPanel
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: Install Composer dependencies (production)
       run: composer install --no-dev --optimize-autoloader --no-interaction
 
     - name: Build Laravel app
@@ -47,7 +88,6 @@ jobs:
             cp .env.example .env
           else
             echo "No .env.example found — creating minimal .env"
-            # Try to get a key from artisan; fallback to PHP random bytes if artisan fails.
             APP_KEY=$(php artisan key:generate --show 2>/dev/null || true)
             if [ -z "$APP_KEY" ]; then
               RAND=$(php -r "echo base64_encode(random_bytes(32));")
@@ -61,27 +101,24 @@ APP_DEBUG=false
 APP_URL=
 EOF
           fi
-
-          # Ensure APP_KEY is present; if not, let artisan write it.
           if ! grep -q '^APP_KEY=' .env || [ -z "$(awk -F= '/^APP_KEY=/{print $2}' .env)" ]; then
             php artisan key:generate
           fi
         else
-          # If .env exists but APP_KEY is missing or empty, generate one.
           APP_KEY_VALUE=$(awk -F= '/^APP_KEY=/{print $2}' .env || true)
           if [ -z "$APP_KEY_VALUE" ]; then
             php artisan key:generate
           fi
         fi
+        # Cache and optimize if artisan is available
+        if command -v php >/dev/null && [ -f artisan ]; then
+          php artisan config:cache || true
+          php artisan route:cache || true
+          php artisan view:cache || true
+        fi
 
-        php artisan config:cache
-        php artisan route:cache
-        php artisan view:cache
-
-    # Optional: run migrations from the runner against the remote DB.
-    # This requires DB_* secrets to be set in repository Settings -> Secrets.
-    - name: Run migrations on remote DB (optional)
-      if: ${{ secrets.DB_HOST != '' }}
+    - name: Run migrations from runner (only when enabled)
+      if: ${{ secrets.RUN_MIGRATIONS == 'true' && secrets.DB_HOST != '' }}
       env:
         DB_CONNECTION: ${{ secrets.DB_CONNECTION || 'mysql' }}
         DB_HOST: ${{ secrets.DB_HOST }}
@@ -91,29 +128,13 @@ EOF
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         APP_ENV: production
       run: |
-        echo "Running migrations against remote DB..."
-        # Ensure vendor and artisan are present
+        echo "Running migrations from CI runner (ensure DB allows external connections)."
+        echo "IMPORTANT: Backup your database before running migrations in production."
         if [ ! -f artisan ] || [ ! -f vendor/autoload.php ]; then
           echo "artisan or vendor missing; aborting migrations"
           exit 1
         fi
-        php artisan migrate --force
-
-    # Alternative: run migrations on the server via SSH (uncomment & configure if you have SSH access)
-    # - name: Run migrations on remote server via SSH (alternative)
-    #   env:
-    #     SSH_HOST: ${{ secrets.SSH_HOST }}
-    #     SSH_USER: ${{ secrets.SSH_USER }}
-    #     SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-    #   run: |
-    #     if [ -z "$SSH_HOST" ] || [ -z "$SSH_PRIVATE_KEY" ]; then
-    #       echo "SSH secrets not configured; skipping"
-    #       exit 0
-    #     fi
-    #     mkdir -p ~/.ssh
-    #     echo "$SSH_KEY" > ~/.ssh/deploy_key
-    #     chmod 600 ~/.ssh/deploy_key
-    #     ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key $SSH_USER@$SSH_HOST "cd /path/to/your/app && php artisan migrate --force"
+        php artisan migrate --force --no-interaction
 
     - name: Upload to cPanel via FTPS (lftp)
       env:
@@ -124,20 +145,26 @@ EOF
       run: |
         sudo apt-get update -y
         sudo apt-get install -y lftp
-        # Upload only newer/changed files and DO NOT delete remote files.
-        # Exclude config/runtime dirs so existing server project and data are preserved.
+        echo "Target CP_PATH: '$CP_PATH'"
+        # Remote check & create if missing
+        lftp -u "$CP_USER","$CP_PASS" -e "\
+          set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate false; set ftp:passive-mode true; \
+          open ftps://$CP_HOST; \
+          if (! test -d \"$CP_PATH\") { mkdir -p \"$CP_PATH\"; } \
+          cd \"$CP_PATH\"; cls -la; bye" || true
+        # Dry-run
         lftp -c "\
-          set ftp:ssl-force true; \
-          set ftp:ssl-protect-data true; \
-          set ssl:verify-certificate false; \
+          set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate false; set ftp:passive-mode true; \
           open -u \"$CP_USER\",\"$CP_PASS\" ftps://$CP_HOST; \
-          mirror -R --only-newer --verbose --parallel=4 \
-            --exclude-glob .git* \
-            --exclude-glob .env \
-            --exclude-glob .env.* \
-            --exclude-glob node_modules \
-            --exclude-glob vendor \
-            --exclude-glob storage \
-            --exclude-glob .github \
-            ./ \"$CP_PATH\" \
+          mirror -R --only-newer --verbose --parallel=4 --dry-run --no-perms \
+            --exclude-glob .git* --exclude-glob .env --exclude-glob .env.* --exclude-glob node_modules \
+            --exclude-glob vendor --exclude-glob storage --exclude-glob .github ./ \"$CP_PATH\" \
+        "
+        # Actual upload
+        lftp -c "\
+          set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate false; set ftp:passive-mode true; \
+          open -u \"$CP_USER\",\"$CP_PASS\" ftps://$CP_HOST; \
+          mirror -R --only-newer --verbose --parallel=4 --no-perms \
+            --exclude-glob .git* --exclude-glob .env --exclude-glob .env.* --exclude-glob node_modules \
+            --exclude-glob vendor --exclude-glob storage --exclude-glob .github ./ \"$CP_PATH\" \
         "
