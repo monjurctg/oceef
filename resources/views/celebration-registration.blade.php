@@ -7,7 +7,7 @@
         <div class="text-center mb-10">
             <div class="flex justify-center mb-6">
                 <div class=" p-3 rounded-full ">
-                    <img src="/logo.png" alt="Logo" class="h-20 w-15 text-indigo-600">
+                    <img src="/public/logo.png" alt="Logo" class="h-20 w-15 text-indigo-600">
                 </div>
             </div>
             <h1 class="text-4xl font-bold text-gray-900 mb-3">OCECF 20th Celebration Registration</h1>

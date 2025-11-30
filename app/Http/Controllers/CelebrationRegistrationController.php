@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CelebrationRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 
 class CelebrationRegistrationController extends Controller
 {
@@ -62,12 +63,18 @@ class CelebrationRegistrationController extends Controller
 
             // Process passport photo
             if ($request->hasFile('passport_photo')) {
-                $passportPhotoPath = $request->file('passport_photo')->store('uploads', 'public');
+                $passportPhoto = $request->file('passport_photo');
+                $passportPhotoName = time() . '_passport_' . Str::random(10) . '.' . $passportPhoto->getClientOriginalExtension();
+                $passportPhoto->move(public_path('uploads'), $passportPhotoName);
+                $passportPhotoPath = 'uploads/' . $passportPhotoName;
             }
 
             // Process transaction screenshot
             if ($request->hasFile('transaction_screenshot')) {
-                $transactionScreenshotPath = $request->file('transaction_screenshot')->store('uploads', 'public');
+                $transactionScreenshot = $request->file('transaction_screenshot');
+                $transactionScreenshotName = time() . '_transaction_' . Str::random(10) . '.' . $transactionScreenshot->getClientOriginalExtension();
+                $transactionScreenshot->move(public_path('uploads'), $transactionScreenshotName);
+                $transactionScreenshotPath = 'uploads/' . $transactionScreenshotName;
             }
 
             // Calculate amount
@@ -120,12 +127,12 @@ class CelebrationRegistrationController extends Controller
             return redirect()->back()->with('success', 'Registration submitted successfully!');
         } catch (\Exception $e) {
             // Clean up uploaded files if registration failed
-            if (isset($passportPhotoPath) && file_exists(public_path('storage/' . $passportPhotoPath))) {
-                unlink(public_path('storage/' . $passportPhotoPath));
+            if (isset($passportPhotoPath) && file_exists(public_path($passportPhotoPath))) {
+                unlink(public_path($passportPhotoPath));
             }
 
-            if (isset($transactionScreenshotPath) && file_exists(public_path('storage/' . $transactionScreenshotPath))) {
-                unlink(public_path('storage/' . $transactionScreenshotPath));
+            if (isset($transactionScreenshotPath) && file_exists(public_path($transactionScreenshotPath))) {
+                unlink(public_path($transactionScreenshotPath));
             }
 
             return redirect()->back()->withInput()->withErrors(['error' => 'Registration failed. Please try again.']);
@@ -205,13 +212,13 @@ class CelebrationRegistrationController extends Controller
             $registration = CelebrationRegistration::findOrFail($id);
 
             // Delete the passport photo if it exists
-            if ($registration->passport_photo && file_exists(public_path('storage/' . $registration->passport_photo))) {
-                unlink(public_path('storage/' . $registration->passport_photo));
+            if ($registration->passport_photo && file_exists(public_path($registration->passport_photo))) {
+                unlink(public_path($registration->passport_photo));
             }
 
             // Delete the transaction screenshot if it exists
-            if ($registration->transaction_screenshot && file_exists(public_path('storage/' . $registration->transaction_screenshot))) {
-                unlink(public_path('storage/' . $registration->transaction_screenshot));
+            if ($registration->transaction_screenshot && file_exists(public_path($registration->transaction_screenshot))) {
+                unlink(public_path($registration->transaction_screenshot));
             }
 
             // Delete the registration from database
