@@ -6,17 +6,15 @@
         <!-- Header -->
         <div class="text-center mb-10">
             <div class="flex justify-center mb-6">
-                <div class="bg-white p-3 rounded-full shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                    </svg>
+                <div class=" p-3 rounded-full ">
+                    <img src="{{ asset('logo.png') }}" alt="Logo" class="h-20 w-15 text-indigo-600">
                 </div>
             </div>
             <h1 class="text-4xl font-bold text-gray-900 mb-3">OCECF 20th Celebration Registration</h1>
             <p class="text-lg text-gray-600 max-w-2xl mx-auto">Join us for our special 20th anniversary celebration. Please complete the registration form below with accurate information.</p>
 
             <!-- Event Dates -->
-            <div class="mt-6 bg-white rounded-xl shadow-md p-4 max-w-2xl mx-auto">
+            <div class="mt-6 rounded-xl shadow-md p-4 max-w-2xl mx-auto">
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Event Schedule</h3>
                 <ul class="text-left space-y-1 text-gray-700">
                     <li class="flex items-start">
@@ -32,7 +30,7 @@
         </div>
 
         <!-- Registration Card -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class=" rounded-2xl shadow-xl overflow-hidden">
             <!-- Card Header -->
             <div class="bg-gradient-to-r from-indigo-600 to-purple-700 px-6 py-5">
                 <div class="flex items-center justify-between">
@@ -375,19 +373,33 @@
 
                         <!-- Amount Display -->
                         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-100">
-                            <div class="flex justify-between items-center">
+                            <div class="flex justify-between items-center mb-3">
                                 <div class="flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <span class="text-sm font-medium text-gray-700">Total Amount:</span>
+                                    <span class="text-sm font-medium text-gray-700">Payment Summary:</span>
                                 </div>
-                                <span id="total_amount" class="text-2xl font-bold text-indigo-700">BDT 1500</span>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Base Amount:</span>
+                                    <span id="base_amount" class="text-sm font-medium text-gray-800">BDT 1500</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Cashout Fee:</span>
+                                    <span id="cashout_fee" class="text-sm font-medium text-gray-800">BDT 0</span>
+                                </div>
+                                <div class="flex justify-between pt-2 border-t border-gray-200">
+                                    <span class="text-base font-medium text-gray-900">Total Amount:</span>
+                                    <span id="total_amount" class="text-xl font-bold text-indigo-700">BDT 1500</span>
+                                </div>
                             </div>
                             <div class="mt-3 text-xs text-gray-600">
                                 <p>• Single Registration (You): BDT 1500</p>
                                 <p>• Additional Family Members: BDT 1000 each</p>
                                 <p>• Driver: BDT 500</p>
+                                <p class="mt-1 font-medium">• Cashout Fee: 10 BDT for up to 500, 20 BDT for up to 1000, 30 BDT for up to 1500, then 2% for higher amounts (not applicable for Bank transfers)</p>
                             </div>
                         </div>
 
@@ -409,7 +421,7 @@
                             <select name="payment_method" required
                                 class="focus:ring-indigo-500 focus:border-indigo-500 block w-full py-3 sm:text-sm border-gray-300 rounded-lg border">
                                 <option value="">Select Payment Method</option>
-                                <option value="Bank" {{ old('payment_method') == 'Bank' ? 'selected' : '' }}>Bank</option>
+                                <!-- <option value="Bank" {{ old('payment_method') == 'Bank' ? 'selected' : '' }}>Bank</option> -->
                                 <option value="Bkash" {{ old('payment_method') == 'Bkash' ? 'selected' : '' }}>Bkash</option>
                                 <option value="Nagad" {{ old('payment_method') == 'Nagad' ? 'selected' : '' }}>Nagad</option>
                                 <option value="Rocket" {{ old('payment_method') == 'Rocket' ? 'selected' : '' }}>Rocket</option>
@@ -503,21 +515,50 @@
     function calculateAmount() {
         const familyMembers = parseInt(document.getElementById('family_members').value) || 0;
         const hasDriver = document.querySelector('input[name="has_driver"]:checked')?.value === '1';
+        const paymentMethod = document.querySelector('select[name="payment_method"]').value;
 
         // Pricing configuration
         const singleRegistrationRate = 1500; // BDT for single registration
         const familyMemberRate = 1000;       // BDT per family member (additional)
         const driverRate = 500;              // BDT per driver
 
-        // Calculate total amount
+        // Calculate base amount
         // Family members field represents additional family members (excluding the registrant)
         // So total people = 1 (registrant) + familyMembers (additional)
-        const amount = singleRegistrationRate +
-                      (familyMembers * familyMemberRate) +
-                      (hasDriver ? driverRate : 0);
+        const baseAmount = singleRegistrationRate +
+                          (familyMembers * familyMemberRate) +
+                          (hasDriver ? driverRate : 0);
 
-        // Update the display
-        document.getElementById('total_amount').textContent = 'BDT ' + amount;
+        // Calculate cashout fee
+        let cashoutFee = 0;
+        // Only calculate cashout fee for Bkash, Nagad, Rocket
+        if (['Bkash', 'Nagad', 'Rocket'].includes(paymentMethod)) {
+            if (baseAmount <= 500) {
+                cashoutFee = 10;
+            } else if (baseAmount <= 1000) {
+                cashoutFee = 20;
+            } else if (baseAmount <= 1500) {
+                cashoutFee = 30;
+            } else {
+                // For amounts above 1500, calculate proportionally
+                // 30 Taka for first 1500, then 2% for the rest
+                const baseFee = 30;
+                const remainingAmount = baseAmount - 1500;
+                let additionalFee = remainingAmount * 0.02;
+                // Round to nearest 10
+                additionalFee = Math.round(additionalFee / 10) * 10;
+                cashoutFee = baseFee + additionalFee;
+            }
+        }
+        // For Bank transfers or when no payment method is selected, cashout fee is 0
+
+        // Calculate total amount
+        const totalAmount = baseAmount + cashoutFee;
+
+        // Update the displays
+        document.getElementById('base_amount').textContent = 'BDT ' + baseAmount;
+        document.getElementById('cashout_fee').textContent = 'BDT ' + cashoutFee;
+        document.getElementById('total_amount').textContent = 'BDT ' + totalAmount;
     }
 
     // Add event listeners
@@ -533,6 +574,9 @@
         driverOptions.forEach(option => {
             option.addEventListener('change', calculateAmount);
         });
+
+        // Recalculate when payment method changes
+        document.querySelector('select[name="payment_method"]').addEventListener('change', calculateAmount);
     });
 </script>
 @endsection

@@ -36,6 +36,7 @@ Route::middleware(['role:1,2'])->group(function () {
     // Celebration registration admin routes
     Route::get('/celebration-registrations', [CelebrationRegistrationController::class, 'showRegistrations'])->name('celebration.registrations.index');
     Route::get('/celebration-registrations/{id}', [CelebrationRegistrationController::class, 'showRegistrationDetail'])->name('celebration.registration.show');
+    Route::get('/celebration-registrations/{id}/print', [CelebrationRegistrationController::class, 'printRegistration'])->name('celebration.registration.print');
 });
 
 // Protected routes for admin only
@@ -51,4 +52,10 @@ Route::middleware(['role:1'])->group(function () {
 
     // Celebration registration admin routes (delete)
     Route::delete('/celebration-registrations/{id}', [CelebrationRegistrationController::class, 'destroy'])->name('celebration.registration.destroy');
+});
+
+// Dashboard - celebration registrations
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard/celebrations', [\App\Http\Controllers\DashboardController::class, 'celebrations'])
+        ->name('dashboard.celebrations');
 });

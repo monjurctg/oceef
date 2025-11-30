@@ -179,30 +179,23 @@
                         <div class="flex justify-between items-center pb-2 border-b border-gray-100">
                             <div class="flex items-center">
                                 <svg class="mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
-                                <span class="text-gray-600">Family Members</span>
+                                <span class="text-gray-600">Registration Fee</span>
                             </div>
-                            <span class="font-medium">BDT {{ $reg->family_members * 500 }}</span>
+                            <span class="font-medium">BDT {{ number_format($reg->amount - $reg->cashout_fee, 2) }}</span>
                         </div>
+                        @if($reg->cashout_fee > 0)
                         <div class="flex justify-between items-center pb-2 border-b border-gray-100">
                             <div class="flex items-center">
                                 <svg class="mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <span class="text-gray-600">Children (Below 5)</span>
+                                <span class="text-gray-600">Cashout Fee</span>
                             </div>
-                            <span class="font-medium">BDT {{ $reg->children_count * 0 }}</span>
+                            <span class="font-medium">BDT {{ number_format($reg->cashout_fee, 2) }}</span>
                         </div>
-                        <div class="flex justify-between items-center pb-4">
-                            <div class="flex items-center">
-                                <svg class="mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                </svg>
-                                <span class="text-gray-600">Driver</span>
-                            </div>
-                            <span class="font-medium">BDT {{ $reg->has_driver ? 200 : 0 }}</span>
-                        </div>
+                        @endif
                         <div class="flex justify-between pt-4 border-t border-gray-200">
                             <span class="text-lg font-semibold text-gray-900">Total Amount</span>
                             <span class="text-2xl font-bold text-green-700">BDT {{ number_format($reg->amount, 2) }}</span>
@@ -260,7 +253,13 @@
                         Admin Actions
                     </h2>
                 </div>
-                <div class="p-6">
+                <div class="p-6 space-y-4">
+                    <a href="{{ route('celebration.registration.print', $reg->id) }}" target="_blank" class="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm transition-all duration-200 transform hover:-translate-y-0.5">
+                        <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Print Registration Form
+                    </a>
                     <form action="{{ route('celebration.registration.destroy', $reg->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this registration? This action cannot be undone.')">
                         @csrf
                         @method('DELETE')

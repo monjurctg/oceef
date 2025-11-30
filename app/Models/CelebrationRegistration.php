@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class CelebrationRegistration extends Model
 {
+    // If your table name differs, set it here:
+    protected $table = 'celebration_registrations';
+
+    // Fillable attributes (adjust as needed)
     protected $fillable = [
         'name',
         'mobile_num',
@@ -25,14 +29,21 @@ class CelebrationRegistration extends Model
         'transaction_number',
         'transaction_screenshot',
         'amount',
+        'cashout_fee',
     ];
 
+    // If you store timestamps differently:
+    public $timestamps = true;
+
+    // Optional: cast registered_at to datetime
     protected $casts = [
+        'registered_at' => 'datetime',
+        'cashout_fee' => 'decimal:2',
+        'amount' => 'decimal:2',
         'has_driver' => 'boolean',
-        'family_members' => 'integer',
-        'children_count' => 'integer',
         'has_children_under_five' => 'boolean',
         'attend_wednesday_night' => 'boolean',
-        'amount' => 'decimal:2',
+        'family_members' => 'integer',
+        'children_count' => 'integer',
     ];
 }

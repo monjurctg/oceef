@@ -77,7 +77,23 @@ class CelebrationRegistrationController extends Controller
                 $validatedData['has_driver'] ?? false
             );
 
+            // Calculate cashout fee
+            $cashoutFee = $this->calculateCashoutFee($amount, $validatedData['payment_method']);
+
+            // Log the calculated cashout fee
+            \Log::info('Calculated cashout fee: ' . $cashoutFee);
+
+            // Ensure cashout fee is a float
+            $cashoutFee = (float) $cashoutFee;
+
+            // Total amount including cashout fee
+            $totalAmount = $amount + $cashoutFee;
+            $totalAmount = (float) $totalAmount;
+            \Log::info('Total amount: ' . $totalAmount);
+
             // Create the celebration registration record
+            \Log::info('Creating registration with data: amount=' . $totalAmount . ', cashout_fee=' . $cashoutFee . ', payment_method=' . $validatedData['payment_method']);
+
             $registration = CelebrationRegistration::create([
                 'name' => $validatedData['name'],
                 'mobile_num' => $validatedData['mobile_num'],
@@ -96,9 +112,11 @@ class CelebrationRegistrationController extends Controller
                 'payment_method' => $validatedData['payment_method'],
                 'transaction_number' => $validatedData['transaction_number'],
                 'transaction_screenshot' => $transactionScreenshotPath,
-                'amount' => $amount,
+                'amount' => $totalAmount,
+                'cashout_fee' => $cashoutFee,
             ]);
 
+            \Log::info('Registration created with ID: ' . $registration->id . ', cashout fee: ' . $registration->cashout_fee);
             return redirect()->back()->with('success', 'Registration submitted successfully!');
         } catch (\Exception $e) {
             // Clean up uploaded files if registration failed
@@ -156,6 +174,24 @@ class CelebrationRegistrationController extends Controller
         }
     }
 
+    public function printRegistration($id)
+    {
+        try {
+            // Check if user is admin (type 1) or moderator (type 2)
+            $user = session('user');
+            if (!$user || ($user['type'] != 1 && $user['type'] != 2)) {
+                abort(403, 'Unauthorized access');
+            }
+
+            // Find the registration with the given ID
+            $registration = CelebrationRegistration::findOrFail($id);
+
+            return view('celebration-registration-print', compact('registration', 'user'));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to load registration details. Please try again.');
+        }
+    }
+
     public function destroy($id)
     {
         try {
@@ -201,5 +237,45 @@ class CelebrationRegistrationController extends Controller
                   ($hasDriver * $this->driverRate);
 
         return $amount;
+    }
+
+    private function calculateCashoutFee($amount, $paymentMethod)
+    {
+        // Log the inputs for debugging
+        \Log::info('Calculating cashout fee for amount: ' . $amount . ', payment method: ' . $paymentMethod);
+
+        // Calculate cashout fee based on tiered rates
+        // For Bkash, Nagad, Rocket:
+        // 10 Taka for 500
+        // 20 Taka for 1000
+        // 30 Taka for 1500
+        // For amounts above 1500, we'll calculate proportionally
+        if (in_array($paymentMethod, ['Bkash', 'Nagad', 'Rocket'])) {
+            if ($amount <= 500) {
+                \Log::info('Cashout fee calculated: 10');
+                return 10;
+            } elseif ($amount <= 1000) {
+                \Log::info('Cashout fee calculated: 20');
+                return 20;
+            } elseif ($amount <= 1500) {
+                \Log::info('Cashout fee calculated: 30');
+                return 30;
+            } else {
+                // For amounts above 1500, calculate proportionally
+                // 30 Taka for first 1500, then 2% for the rest
+                $baseFee = 30;
+                $remainingAmount = $amount - 1500;
+                $additionalFee = $remainingAmount * 0.02;
+                // Round to nearest 10
+                $additionalFee = round($additionalFee / 10) * 10;
+                $totalFee = $baseFee + $additionalFee;
+                \Log::info('Cashout fee calculated: ' . $totalFee . ' (base: ' . $baseFee . ', additional: ' . $additionalFee . ')');
+                return $totalFee;
+            }
+        }
+
+        // For Bank transfers, no fee
+        \Log::info('Cashout fee calculated: 0 (bank transfer)');
+        return 0;
     }
 }

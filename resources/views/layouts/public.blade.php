@@ -46,7 +46,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h1 class="text-xl font-bold text-gray-900">CollegeCadex</h1>
+                        <h1 class="text-xl font-bold text-gray-900">OCECF Celebration Reg</h1>
                     </div>
                     <div class="flex items-center space-x-4">
                         <a href="/" class="text-gray-600 hover:text-gray-900 flex items-center">
