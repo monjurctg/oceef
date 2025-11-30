@@ -34,6 +34,7 @@ Route::middleware(['role:1,2'])->group(function () {
     Route::put('/register/{id}', [RegisterController::class, 'update'])->name('register.update');
 
     // Celebration registration admin routes
+
     Route::get('/celebration-registrations', [CelebrationRegistrationController::class, 'showRegistrations'])->name('celebration.registrations.index');
     Route::get('/celebration-registrations/{id}', [CelebrationRegistrationController::class, 'showRegistrationDetail'])->name('celebration.registration.show');
     Route::get('/celebration-registrations/{id}/print', [CelebrationRegistrationController::class, 'printRegistration'])->name('celebration.registration.print');
