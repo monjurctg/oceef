@@ -257,7 +257,7 @@
 </head>
 <body>
     <div class="watermark">
-        <img src="{{ asset('logo.png') }}" alt="Watermark Logo" class="watermark-logo">
+        <img src="/logo.png" alt="Watermark Logo" class="watermark-logo">
     </div>
 
     <div class="no-print">
@@ -273,7 +273,7 @@
         <!-- Letterhead -->
         <div class="header">
             <div class="logo-container">
-                <img src="{{ asset('logo.png') }}" alt="Faujdarhat Cadet College Logo" class="logo">
+                <img src="/logo.png" alt="Faujdarhat Cadet College Logo" class="logo">
             </div>
             <h1>OCECF 20th Anniversary Celebration</h1>
             <h2>Registration Form</h2>
@@ -369,7 +369,7 @@
                 <div class="image-container">
                     <div class="image-label">Passport Size Photo</div>
                     @if($registration->passport_photo)
-                        <img src="{{ asset('storage/' . $registration->passport_photo) }}" alt="Passport Photo" style="max-width: 100%; max-height: 90px; border: 0.5px solid #bdc3c7;">
+                        <img src="/storage/{{ $registration->passport_photo }}" alt="Passport Photo" style="max-width: 100%; max-height: 90px; border: 0.5px solid #bdc3c7;">
                     @else
                         <div class="image-placeholder">No Photo Attached</div>
                     @endif
@@ -378,7 +378,7 @@
                 <div class="image-container">
                     <div class="image-label">Payment Slip</div>
                     @if($registration->transaction_screenshot)
-                        <img src="{{ asset('storage/' . $registration->transaction_screenshot) }}" alt="Payment Slip" style="max-width: 100%; max-height: 90px; border: 0.5px solid #bdc3c7;">
+                        <img src="/storage/{{ $registration->transaction_screenshot }}" alt="Payment Slip" style="max-width: 100%; max-height: 90px; border: 0.5px solid #bdc3c7;">
                     @else
                         <div class="image-placeholder">No Payment Slip Attached</div>
                     @endif

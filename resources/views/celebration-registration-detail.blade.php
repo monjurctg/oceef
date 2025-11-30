@@ -217,7 +217,7 @@
                 </div>
                 <div class="p-6">
                     <div class="flex justify-center">
-                        <img src="{{ asset('storage/' . $reg->passport_photo) }}" alt="Passport Photo" class="max-w-full h-auto rounded-lg shadow-lg border border-gray-200">
+                        <img src="/storage/{{ $reg->passport_photo }}" alt="Passport Photo" class="max-w-full h-auto rounded-lg shadow-lg border border-gray-200">
                     </div>
                 </div>
             </div>
@@ -236,7 +236,7 @@
                 </div>
                 <div class="p-6">
                     <div class="flex justify-center">
-                        <img src="{{ asset('storage/' . $reg->transaction_screenshot) }}" alt="Transaction Screenshot" class="max-w-full h-auto rounded-lg shadow-lg border border-gray-200">
+                        <img src="/storage/{{ $reg->transaction_screenshot }}" alt="Transaction Screenshot" class="max-w-full h-auto rounded-lg shadow-lg border border-gray-200">
                     </div>
                 </div>
             </div>
