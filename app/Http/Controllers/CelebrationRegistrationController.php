@@ -40,7 +40,7 @@ class CelebrationRegistrationController extends Controller
             'passport_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'payment_method' => 'required|string|in:Bank,Bkash,Nagad,Rocket',
             'transaction_number' => 'required|string|max:100',
-            'transaction_screenshot' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'transaction_screenshot' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
             // Custom error messages
             'mobile_num.regex' => 'Please enter a valid Bangladesh mobile number (e.g., 01XXXXXXXXX).',
@@ -48,7 +48,6 @@ class CelebrationRegistrationController extends Controller
             'family_members.max' => 'Maximum 50 family members allowed.',
             'children_count.max' => 'Maximum 20 children allowed.',
             'passport_photo.required' => 'Passport size photo is required.',
-            'transaction_screenshot.required' => 'Transaction screenshot is required.',
             'nid.required' => 'NID is required.',
             'bncc_batch.required' => 'BNCC Batch is required.',
             'religion.required' => 'Religion is required.',

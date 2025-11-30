@@ -452,7 +452,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        Transaction Screenshot <span class="text-red-500">*</span>
+                        Transaction Screenshot <span class="text-gray-500">(Optional)</span>
                     </label>
                     <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-indigo-300 border-dashed rounded-xl bg-indigo-50">
                         <div class="space-y-1 text-center">
@@ -462,14 +462,14 @@
                             <div class="flex text-sm text-indigo-600">
                                 <label for="transaction_screenshot" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                                     <span>Upload a file</span>
-                                    <input id="transaction_screenshot" name="transaction_screenshot" type="file" class="sr-only" required>
+                                    <input id="transaction_screenshot" name="transaction_screenshot" type="file" class="sr-only">
                                 </label>
                                 <p class="pl-1">or drag and drop</p>
                             </div>
                             <p class="text-xs text-indigo-500">PNG, JPG, GIF up to 2MB</p>
                         </div>
                     </div>
-                    <p class="mt-2 text-sm text-gray-500">Please upload a clear screenshot of your payment transaction</p>
+                    <p class="mt-2 text-sm text-gray-500">Please upload a clear screenshot of your payment transaction (optional)</p>
                 </div>
 
                 <!-- Contact Information -->
