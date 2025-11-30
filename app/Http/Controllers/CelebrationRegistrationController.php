@@ -37,7 +37,7 @@ class CelebrationRegistrationController extends Controller
             'has_children_under_five' => 'required|boolean',
             'attend_wednesday_night' => 'required|boolean',
             'passport_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'payment_method' => 'required|string|in:Bank,Bkash,Nogod',
+            'payment_method' => 'required|string|in:Bank,Bkash,Nagad,Rocket',
             'transaction_number' => 'required|string|max:100',
             'transaction_screenshot' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
@@ -52,7 +52,7 @@ class CelebrationRegistrationController extends Controller
             'bncc_batch.required' => 'BNCC Batch is required.',
             'religion.required' => 'Religion is required.',
             'has_children_under_five.required' => 'Please specify if you bring children under five.',
-            'attend_wednesday_night.required' => 'Please specify if you will attend on Wednesday night.',
+            'attend_wednesday_night.required' => 'Please specify if you will attend on Thursday night.',
         ]);
 
         try {

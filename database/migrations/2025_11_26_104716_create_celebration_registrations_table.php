@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('children_count')->default(0);
             $table->boolean('has_driver')->default(false);
             $table->string('nid')->nullable();
-            $table->string('payment_method'); // Bank, Bkash, Nogod
+            $table->string('payment_method'); // Bank, Bkash, Nagad, Rocket
             $table->string('transaction_number');
             $table->string('transaction_screenshot')->nullable();
             $table->timestamps();

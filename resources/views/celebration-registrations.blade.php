@@ -98,7 +98,8 @@
                     <option>All Methods</option>
                     <option>Bank</option>
                     <option>Bkash</option>
-                    <option>Nogod</option>
+                    <option>Nagad</option>
+                    <option>Rocket</option>
                 </select>
             </div>
             <div>

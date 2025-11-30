@@ -356,10 +356,10 @@
                             </div>
                         </div>
 
-                        <!-- Attend Wednesday Night -->
+                        <!-- Attend Thursday Night -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                Would you attend on Wednesday Night (Ex-Cadet Only)? <span class="text-red-500">*</span>
+                                Would you attend on Thursday Night (Ex-Cadet Only)? <span class="text-red-500">*</span>
                             </label>
                             <div class="mt-2 space-y-2">
                                 <div class="flex items-center">
@@ -409,9 +409,10 @@
                             <select name="payment_method" required
                                 class="focus:ring-indigo-500 focus:border-indigo-500 block w-full py-3 sm:text-sm border-gray-300 rounded-lg border">
                                 <option value="">Select Payment Method</option>
-                                <option value="Bank" {{ old('payment_method') == 'Bank' ? 'selected' : '' }}>Bank Transfer</option>
+                                <option value="Bank" {{ old('payment_method') == 'Bank' ? 'selected' : '' }}>Bank</option>
                                 <option value="Bkash" {{ old('payment_method') == 'Bkash' ? 'selected' : '' }}>Bkash</option>
-                                <option value="Nogod" {{ old('payment_method') == 'Nogod' ? 'selected' : '' }}>Nogod</option>
+                                <option value="Nagad" {{ old('payment_method') == 'Nagad' ? 'selected' : '' }}>Nagad</option>
+                                <option value="Rocket" {{ old('payment_method') == 'Rocket' ? 'selected' : '' }}>Rocket</option>
                             </select>
                         </div>
 
