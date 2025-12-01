@@ -40,7 +40,7 @@ class CelebrationRegistrationController extends Controller
             'passport_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'payment_method' => 'required|string|in:Bank,Bkash,Nagad,Rocket',
             'transaction_number' => 'required|string|max:100',
-            'transaction_screenshot' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'transaction_screenshot' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
             // Custom error messages
             'mobile_num.regex' => 'Please enter a valid Bangladesh mobile number (e.g., 01XXXXXXXXX).',
@@ -48,6 +48,7 @@ class CelebrationRegistrationController extends Controller
             'family_members.max' => 'Maximum 50 family members allowed.',
             'children_count.max' => 'Maximum 20 children allowed.',
             'passport_photo.required' => 'Passport size photo is required.',
+            'transaction_screenshot.required' => 'Transaction screenshot is required.',
             'nid.required' => 'NID is required.',
             'bncc_batch.required' => 'BNCC Batch is required.',
             'religion.required' => 'Religion is required.',
@@ -138,7 +139,7 @@ class CelebrationRegistrationController extends Controller
         }
     }
 
-    public function showRegistrations()
+    public function showRegistrations(Request $request)
     {
         try {
             // Check if user is admin (type 1) or moderator (type 2)
@@ -147,13 +148,44 @@ class CelebrationRegistrationController extends Controller
                 abort(403, 'Unauthorized access');
             }
 
+            // Get all distinct religions for filter dropdown
+            $religions = CelebrationRegistration::select('religion')->distinct()->pluck('religion');
+
+            // Build query with filters
+            $query = CelebrationRegistration::query();
+
+            // Apply religion filter
+            if ($request->filled('religion')) {
+                $query->where('religion', $request->religion);
+            }
+
+            // Apply attend Wednesday night filter
+            if ($request->filled('attend_wednesday_night')) {
+                $query->where('attend_wednesday_night', $request->attend_wednesday_night);
+            }
+
+            // Apply search filter
+            if ($request->filled('search')) {
+                $query->where(function($q) use ($request) {
+                    $q->where('name', 'LIKE', '%' . $request->search . '%')
+                      ->orWhere('email', 'LIKE', '%' . $request->search . '%');
+                });
+            }
+
+            // Apply payment method filter
+            if ($request->filled('payment_method')) {
+                $query->where('payment_method', $request->payment_method);
+            }
+
             // Get registrations from database with pagination
-            $registrations = CelebrationRegistration::latest()->paginate(10);
+            $registrations = $query->latest()->paginate(10)->appends($request->except('page'));
 
             // Create a simple paginator-like structure
             $data = [
                 'registrations' => $registrations,
                 'user' => $user,
+                'religions' => $religions,
+                'filters' => $request->only(['religion', 'attend_wednesday_night', 'search', 'payment_method'])
             ];
 
             return view('celebration-registrations', $data);
