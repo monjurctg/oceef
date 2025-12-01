@@ -213,6 +213,7 @@ class CelebrationRegistrationController extends Controller
     }
 
     public function printRegistration($id)
+
     {
         try {
             // Check if user is admin (type 1) or moderator (type 2)
