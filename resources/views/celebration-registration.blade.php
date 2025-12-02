@@ -9,6 +9,9 @@
                 <div class=" p-3 rounded-full ">
                     <img src="/public/logo.png" alt="Logo" class="h-20 w-15 text-indigo-600">
                 </div>
+                 <div class=" p-3 rounded-full ">
+                    <img src="/public/celebration.png" alt="Logo" class="h-20 w-15 text-indigo-600">
+                </div>
             </div>
             <h1 class="text-4xl font-bold text-gray-900 mb-3">OCECF 20th Celebration Registration</h1>
             <p class="text-lg text-gray-600 max-w-2xl mx-auto">Join us for our special 20th anniversary celebration. Please complete the registration form below with accurate information.</p>
@@ -467,7 +470,7 @@
                             <div class="flex text-sm text-indigo-600">
                                 <label for="transaction_screenshot" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                                     <span>Upload a file</span>
-                                    <input id="transaction_screenshot" name="transaction_screenshot" type="file" class="sr-only" required>
+                                    <input id="transaction_screenshot" name="transaction_screenshot" type="file" class="sr-only" >
                                 </label>
                                 <p class="pl-1">or drag and drop</p>
                             </div>
