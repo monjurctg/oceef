@@ -369,7 +369,8 @@
                 <div class="image-container">
                     <div class="image-label">Passport Size Photo</div>
                     @if($registration->passport_photo)
-                        <img src="/{{ $registration->passport_photo }}" alt="Passport Photo" style="max-width: 100%; max-height: 90px; border: 0.5px solid #bdc3c7;">
+
+                        <img src="{{asset('/public/'.$registration->passport_photo )}}" alt="Passport Photo" style="max-width: 100%; max-height: 90px; border: 0.5px solid #bdc3c7;">
                     @else
                         <div class="image-placeholder">No Photo Attached</div>
                     @endif
@@ -378,7 +379,7 @@
                 <div class="image-container">
                     <div class="image-label">Payment Slip</div>
                     @if($registration->transaction_screenshot)
-                        <img src="/{{ $registration->transaction_screenshot }}" alt="Payment Slip" style="max-width: 100%; max-height: 90px; border: 0.5px solid #bdc3c7;">
+      <img src="{{ asset('/public/'.$registration->transaction_screenshot) }}" alt="Payment Slip" style="max-width: 100%; max-height: 90px; border: 0.5px solid #bdc3c7;">
                     @else
                         <div class="image-placeholder">No Payment Slip Attached</div>
                     @endif
