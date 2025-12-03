@@ -5,12 +5,12 @@
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-10">
-            <div class="flex justify-center mb-6">
+            <div class="flex justify-center mb-6 items-center">
                 <div class=" p-3 rounded-full ">
                     <img src="/public/logo.png" alt="Logo" class="h-20 w-15 text-indigo-600">
                 </div>
-                 <div class=" p-3 rounded-full ">
-                    <img src="/public/celebration.png" alt="Logo" class="h-20 w-15 text-indigo-600">
+                 <div class=" p-3 rounded-full mt-5 ">
+                    <img src="/public/celebration.png" alt="Logo" class="h-16 w-16 text-indigo-600">
                 </div>
             </div>
             <h1 class="text-4xl font-bold text-gray-900 mb-3">OCECF 20th Celebration Registration</h1>
@@ -491,7 +491,7 @@
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-yellow-800">Contact Information</h3>
                             <div class="mt-2 text-sm text-yellow-700">
-                                <p><strong>ATM Kawser Habib</strong> - 01815199111 (Program Convenor, OCECF 20th Celebration)</p>
+                                <p><strong>ATM Kawsar Habib</strong> - 01815199111 (Program Convenor, OCECF 20th Celebration)</p>
                                 <p><strong>Abdul Aziz</strong> - 01821225000 (Program Secretary, OCECF 20th Celebration)</p>
                             </div>
                         </div>
