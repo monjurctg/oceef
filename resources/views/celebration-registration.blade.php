@@ -374,10 +374,6 @@
                             </div>
                         </div>
 
-                        <!-- Image Above Payment Summary -->
-                        <div class="mt-6 text-center">
-                            <img src="/public/payment.jpeg" alt="Payment Information" class="mx-auto rounded-lg shadow-md max-w-full h-auto">
-                        </div>
 
                         <!-- Amount Display -->
                         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-100">
@@ -419,6 +415,11 @@
                                 </svg>
                                 Payment Information
                             </h3>
+                        </div>
+
+                        <!-- Image Above Payment Summary -->
+                        <div class="mt-6 text-center">
+                            <img src="/public/payment.jpeg" alt="Payment Information" class="mx-auto rounded-lg shadow-md max-w-full h-auto">
                         </div>
 
                         <!-- Payment Method -->
