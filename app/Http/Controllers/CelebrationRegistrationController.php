@@ -185,7 +185,19 @@ class CelebrationRegistrationController extends Controller
                 'registrations' => $registrations,
                 'user' => $user,
                 'religions' => $religions,
-                'filters' => $request->only(['religion', 'attend_wednesday_night', 'search', 'payment_method'])
+                'filters' => $request->only(['religion', 'attend_wednesday_night', 'search', 'payment_method']),
+                'stats' => [
+                    'total_registrations' => CelebrationRegistration::count(),
+                    'total_revenue' => CelebrationRegistration::sum('amount'),
+                    'avg_family_size' => CelebrationRegistration::avg('family_members') ?? 0,
+                    'total_drivers' => CelebrationRegistration::where('has_driver', true)->count(),
+                    'total_thursday' => CelebrationRegistration::where('attend_wednesday_night', true)->count(),
+                    'most_common_religion' => CelebrationRegistration::select('religion')
+                        ->selectRaw('count(*) as count')
+                        ->groupBy('religion')
+                        ->orderByDesc('count')
+                        ->value('religion')
+                ]
             ];
 
             return view('celebration-registrations', $data);

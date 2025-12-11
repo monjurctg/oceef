@@ -9,13 +9,7 @@
                 <h1 class="text-3xl font-bold text-gray-900">Celebration Registrations</h1>
                 <p class="mt-1 text-sm text-gray-600">Manage all celebration event registrations</p>
             </div>
-            <div class="mt-4 md:mt-0">
-                <button onclick="window.print()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    Print Report
-                </button>
+
             </div>
         </div>
     </div>
@@ -31,7 +25,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-blue-100">Total Registrations</h3>
-                    <p class="text-3xl font-bold">{{ $registrations->total() }}</p>
+                    <p class="text-3xl font-bold">{{ $stats['total_registrations'] }}</p>
                 </div>
             </div>
         </div>
@@ -45,7 +39,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-green-100">Total Revenue</h3>
-                    <p class="text-3xl font-bold">BDT {{ number_format($registrations->sum('amount'), 2) }}</p>
+                    <p class="text-3xl font-bold">BDT {{ number_format($stats['total_revenue'], 2) }}</p>
                 </div>
             </div>
         </div>
@@ -60,11 +54,7 @@
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-purple-100">Avg. Family Size</h3>
                     <p class="text-3xl font-bold">
-                        @if($registrations->count() > 0)
-                            {{ round($registrations->avg('family_members'), 1) }}
-                        @else
-                            0
-                        @endif
+                        {{ round($stats['avg_family_size'], 1) }}
                     </p>
                 </div>
             </div>
@@ -79,7 +69,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-yellow-100">With Drivers</h3>
-                    <p class="text-3xl font-bold">{{ $registrations->where('has_driver', true)->count() }}</p>
+                    <p class="text-3xl font-bold">{{ $stats['total_drivers'] }}</p>
                 </div>
             </div>
         </div>
@@ -93,7 +83,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-indigo-100">Attending Thursday</h3>
-                    <p class="text-3xl font-bold">{{ $registrations->where('attend_wednesday_night', true)->count() }}</p>
+                    <p class="text-3xl font-bold">{{ $stats['total_thursday'] }}</p>
                 </div>
             </div>
         </div>
@@ -108,11 +98,7 @@
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-pink-100">Most Common Religion</h3>
                     <p class="text-xl font-bold">
-                        @php
-                            $religionCounts = $registrations->groupBy('religion')->map(function($regs) { return $regs->count(); });
-                            $mostCommonReligion = $religionCounts->keys()->first();
-                        @endphp
-                        {{ $mostCommonReligion ?? 'N/A' }}
+                        {{ $stats['most_common_religion'] ?? 'N/A' }}
                     </p>
                 </div>
             </div>
