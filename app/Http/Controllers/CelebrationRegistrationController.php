@@ -189,7 +189,7 @@ class CelebrationRegistrationController extends Controller
                 'stats' => [
                     'total_registrations' => CelebrationRegistration::count(),
                     'total_revenue' => CelebrationRegistration::sum('amount'),
-                    'avg_family_size' => CelebrationRegistration::avg('family_members') ?? 0,
+                    'total_attendees' => CelebrationRegistration::count() + CelebrationRegistration::sum('family_members'),
                     'total_drivers' => CelebrationRegistration::where('has_driver', true)->count(),
                     'total_thursday' => CelebrationRegistration::where('attend_wednesday_night', true)->count(),
                     'most_common_religion' => CelebrationRegistration::select('religion')

@@ -52,9 +52,9 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-sm font-medium text-purple-100">Avg. Family Size</h3>
+                    <h3 class="text-sm font-medium text-purple-100">Total Attendees</h3>
                     <p class="text-3xl font-bold">
-                        {{ round($stats['avg_family_size'], 1) }}
+                        {{ $stats['total_attendees'] }}
                     </p>
                 </div>
             </div>
